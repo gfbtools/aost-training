@@ -7,6 +7,7 @@ import ModuleView from './components/ModuleView.jsx'
 import LessonView from './components/LessonView.jsx'
 import AIAssistant from './components/AIAssistant.jsx'
 import AdminDashboard from './components/AdminDashboard.jsx'
+import EditProfileModal from './components/EditProfileModal.jsx'
 
 export default function App() {
   const prog = useProgress()
@@ -17,6 +18,7 @@ export default function App() {
   const [moduleId, setModule]  = useState(null)
   const [lessonId, setLesson]  = useState(null)
   const [adminOpen,setAdmin]   = useState(false)
+  const [editOpen, setEdit]    = useState(false)
 
   const nav = (v, t = null, m = null, l = null) => {
     setView(v); setTrack(t); setModule(m); setLesson(l)
@@ -34,6 +36,7 @@ export default function App() {
         onHome={() => nav('dashboard')}
         profile={profile}
         currentView={view}
+        onEditProfile={() => setEdit(true)}
       />
 
       <main style={{ flex: 1 }}>
@@ -120,6 +123,18 @@ export default function App() {
       {/* Admin Dashboard Modal */}
       {adminOpen && (
         <AdminDashboard onClose={() => setAdmin(false)} />
+      )}
+
+      {/* Edit Profile Modal */}
+      {editOpen && (
+        <EditProfileModal
+          profile={profile}
+          onClose={() => setEdit(false)}
+          onSave={(updated) => {
+            saveProfile(updated)
+            nav('dashboard')
+          }}
+        />
       )}
     </div>
   )

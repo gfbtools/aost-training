@@ -1,7 +1,7 @@
 import React from 'react'
 const BASE = import.meta.env.BASE_URL
 
-export default function Header({ onHome, profile, currentView }) {
+export default function Header({ onHome, profile, currentView, onEditProfile }) {
   return (
     <header style={{
       background: 'rgba(10,30,48,0.92)',
@@ -33,12 +33,22 @@ export default function Header({ onHome, profile, currentView }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {profile && (
-            <div style={{ textAlign: 'right' }}>
+            <button
+              onClick={onEditProfile}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                textAlign: 'right', padding: '4px 8px', borderRadius: 8,
+                transition: 'var(--trans)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--faint)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'none'}
+              title="Edit profile"
+            >
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
-                {profile.name}
+                {profile.name} <span style={{ opacity: 0.4, fontSize: 10 }}>✎</span>
               </div>
               <div style={{ fontSize: 10, color: 'var(--muted)' }}>{profile.location}</div>
-            </div>
+            </button>
           )}
           {currentView !== 'dashboard' && (
             <button className="btn btn-ghost" style={{ fontSize: 12 }} onClick={onHome}>
