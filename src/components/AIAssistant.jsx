@@ -50,6 +50,7 @@ export default function AIAssistant({ profile, currentTrack, currentModule }) {
             loc:     profile?.location,
             track:   currentTrack,
             module:  currentModule,
+            mode:    profile?.roleId ? 'training' : 'quick-ask',
           },
         }),
       })

@@ -1,8 +1,14 @@
 import React, { useState } from 'react'
 import { ROLES } from '../data/roles.js'
+import AIAssistant from './AIAssistant.jsx'
 
 const BASE = import.meta.env.BASE_URL
 const LOCATIONS = ['Tampa', "Land O'Lakes", 'Wesley Chapel', 'Valrico']
+const GUEST_KEY = 'aost-guest-v1'
+
+const loadGuest = () => {
+  try { return JSON.parse(localStorage.getItem(GUEST_KEY)) || null } catch { return null }
+}
 
 export default function Registration({ onComplete }) {
   const [step, setStep]       = useState(1) // 1: name/role  2: experience
@@ -11,6 +17,18 @@ export default function Registration({ onComplete }) {
   const [location, setLoc]    = useState('')
   const [experience, setExp]  = useState('') // 'new' | 'experienced'
   const [error, setError]     = useState('')
+
+  // Quick Ask — lightweight identity for using the AI assistant without full registration
+  const [guest, setGuest]         = useState(loadGuest)
+  const [quickName, setQuickName] = useState('')
+  const [quickLoc, setQuickLoc]   = useState('')
+
+  const activateQuickAsk = () => {
+    if (!quickName.trim() || !quickLoc) return
+    const g = { name: quickName.trim(), location: quickLoc }
+    localStorage.setItem(GUEST_KEY, JSON.stringify(g))
+    setGuest(g)
+  }
 
   const role = ROLES.find(r => r.id === roleId)
 
@@ -177,6 +195,53 @@ export default function Registration({ onComplete }) {
           </div>
         )}
       </div>
+
+      {/* Quick Ask — no registration required */}
+      <div className="fade-in" style={{
+        width: '100%', maxWidth: 480, marginTop: 20,
+        background: 'rgba(14,124,123,0.08)',
+        border: '1px solid rgba(14,124,123,0.25)',
+        borderRadius: 14, padding: '20px 24px',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--teal)', marginBottom: 4 }}>
+          💬 Just have a quick question?
+        </div>
+        <p className="body-sm" style={{ marginBottom: 14 }}>
+          You don't need to complete sign-up to use Ask AOST. Enter your name and location below,
+          then tap the chat button in the corner — anytime, before or instead of training.
+        </p>
+        {guest ? (
+          <div style={{ fontSize: 13, color: 'var(--teal)' }}>
+            ✓ Ready as <strong>{guest.name}</strong> ({guest.location}) — open the chat button to ask.
+            {' '}
+            <button className="btn-ghost" style={{ fontSize: 12, padding: '2px 6px' }}
+              onClick={() => { localStorage.removeItem(GUEST_KEY); setGuest(null); setQuickName(''); setQuickLoc('') }}>
+              Change
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <input
+              className="input" placeholder="Your name"
+              value={quickName} onChange={e => setQuickName(e.target.value)}
+              style={{ flex: '1 1 140px' }}
+            />
+            <select
+              className="input" value={quickLoc} onChange={e => setQuickLoc(e.target.value)}
+              style={{ flex: '1 1 140px' }}
+            >
+              <option value="">Your location</option>
+              {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <button className="btn btn-secondary" onClick={activateQuickAsk}
+              disabled={!quickName.trim() || !quickLoc}>
+              Enable Ask AOST
+            </button>
+          </div>
+        )}
+      </div>
+
+      <AIAssistant profile={guest} currentTrack={null} currentModule={null} />
 
       <p className="body-sm" style={{ marginTop: 24, textAlign: 'center', opacity: 0.5, maxWidth: 400 }}>
         Your progress is saved automatically. You can return to this training at any time and pick up where you left off.

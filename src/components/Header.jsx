@@ -1,7 +1,33 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 const BASE = import.meta.env.BASE_URL
 
-export default function Header({ onHome, profile, currentView, onEditProfile }) {
+export default function Header({ onHome, profile, currentView, onEditProfile, onOpenAdmin, onOpenKB, onShareProgress }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false) }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [menuOpen])
+
+  const menuItem = (label, onClick) => (
+    <button
+      onClick={() => { setMenuOpen(false); onClick() }}
+      style={{
+        display: 'block', width: '100%', textAlign: 'left',
+        background: 'none', border: 'none', cursor: 'pointer',
+        padding: '10px 14px', fontSize: 13, color: 'rgba(255,255,255,0.85)',
+        borderRadius: 6,
+      }}
+      onMouseEnter={e => e.currentTarget.style.background = 'var(--faint)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'none'}
+    >
+      {label}
+    </button>
+  )
+
   return (
     <header style={{
       background: 'rgba(10,30,48,0.92)',
@@ -31,7 +57,7 @@ export default function Header({ onHome, profile, currentView, onEditProfile }) 
           Training University
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {profile && (
             <button
               onClick={onEditProfile}
@@ -50,10 +76,42 @@ export default function Header({ onHome, profile, currentView, onEditProfile }) 
               <div style={{ fontSize: 10, color: 'var(--muted)' }}>{profile.location}</div>
             </button>
           )}
+
           {currentView !== 'dashboard' && (
             <button className="btn btn-ghost" style={{ fontSize: 12 }} onClick={onHome}>
               ← My Path
             </button>
+          )}
+
+          {/* Settings / Admin menu */}
+          {(onOpenAdmin || onOpenKB || onShareProgress) && (
+            <div ref={menuRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMenuOpen(o => !o)}
+                title="Tools & Admin"
+                style={{
+                  background: menuOpen ? 'var(--faint)' : 'none',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8, width: 34, height: 34,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', fontSize: 16, color: 'rgba(255,255,255,0.8)',
+                }}
+              >
+                ⚙
+              </button>
+              {menuOpen && (
+                <div className="scale-in" style={{
+                  position: 'absolute', top: 42, right: 0, minWidth: 200,
+                  background: 'var(--navy2)', border: '1px solid var(--border2)',
+                  borderRadius: 10, padding: 6, boxShadow: 'var(--shadow)',
+                  zIndex: 200,
+                }}>
+                  {onShareProgress && menuItem('📋 Share My Progress', onShareProgress)}
+                  {onOpenKB        && menuItem('🧠 Knowledge Base', onOpenKB)}
+                  {onOpenAdmin     && menuItem('🔐 Admin Dashboard', onOpenAdmin)}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

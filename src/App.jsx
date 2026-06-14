@@ -8,6 +8,7 @@ import LessonView from './components/LessonView.jsx'
 import AIAssistant from './components/AIAssistant.jsx'
 import AdminDashboard from './components/AdminDashboard.jsx'
 import EditProfileModal from './components/EditProfileModal.jsx'
+import KnowledgeBaseAdmin from './components/KnowledgeBaseAdmin.jsx'
 
 export default function App() {
   const prog = useProgress()
@@ -19,6 +20,7 @@ export default function App() {
   const [lessonId, setLesson]  = useState(null)
   const [adminOpen,setAdmin]   = useState(false)
   const [editOpen, setEdit]    = useState(false)
+  const [kbOpen,   setKB]      = useState(false)
 
   const nav = (v, t = null, m = null, l = null) => {
     setView(v); setTrack(t); setModule(m); setLesson(l)
@@ -37,6 +39,18 @@ export default function App() {
         profile={profile}
         currentView={view}
         onEditProfile={() => setEdit(true)}
+        onOpenAdmin={() => setAdmin(true)}
+        onOpenKB={() => setKB(true)}
+        onShareProgress={() => {
+          const exportData = {
+            profile,
+            progress: JSON.parse(localStorage.getItem('aost-progress-v2') || '{}'),
+            quizzes:  JSON.parse(localStorage.getItem('aost-quizzes-v2')  || '{}'),
+          }
+          navigator.clipboard.writeText(JSON.stringify(exportData))
+            .then(() => alert('Progress code copied! Share with your admin.'))
+            .catch(() => prompt('Copy this progress code:', JSON.stringify(exportData)))
+        }}
       />
 
       <main style={{ flex: 1 }}>
@@ -80,37 +94,11 @@ export default function App() {
       <footer style={{
         borderTop: '1px solid var(--border)',
         padding: '16px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        textAlign: 'center',
       }}>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
           Advanced Oral Surgery of Tampa · Training University · Internal Use Only
         </span>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          {/* Export progress code */}
-          <button
-            className="btn btn-ghost"
-            style={{ fontSize: 11 }}
-            onClick={() => {
-              const exportData = {
-                profile,
-                progress: JSON.parse(localStorage.getItem('aost-progress-v2') || '{}'),
-                quizzes:  JSON.parse(localStorage.getItem('aost-quizzes-v2')  || '{}'),
-              }
-              navigator.clipboard.writeText(JSON.stringify(exportData))
-                .then(() => alert('Progress code copied! Share with your admin.'))
-                .catch(() => prompt('Copy this progress code:', JSON.stringify(exportData)))
-            }}
-          >
-            📋 Share My Progress
-          </button>
-          <button
-            className="btn btn-ghost"
-            style={{ fontSize: 11 }}
-            onClick={() => setAdmin(true)}
-          >
-            Admin
-          </button>
-        </div>
       </footer>
 
       {/* AI Assistant - always visible when registered */}
@@ -135,6 +123,11 @@ export default function App() {
             nav('dashboard')
           }}
         />
+      )}
+
+      {/* Knowledge Base Admin Modal */}
+      {kbOpen && (
+        <KnowledgeBaseAdmin onClose={() => setKB(false)} />
       )}
     </div>
   )

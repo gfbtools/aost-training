@@ -1,70 +1,144 @@
-// AOST Training University — AI Assistant Worker
+// AOST Training University — AI Assistant Worker v2
+// "Virtual Karen" — institutional knowledge retrieval + general OMS assistant
+//
 // Deploy: Cloudflare Dashboard → Workers → Create → Paste → Deploy
-// Env var: ANTHROPIC_API_KEY (encrypted)
+// Required env vars (Settings → Variables, encrypt all):
+//   ANTHROPIC_API_KEY   — your Anthropic API key
+//   SUPABASE_URL        — e.g. https://xxxxx.supabase.co
+//   SUPABASE_ANON_KEY   — Supabase anon/public key (read-only access to kb_entries)
 
-const SYSTEM_PROMPT = `You are the AOST Training Assistant for Advanced Oral Surgery of Tampa.
+const SYSTEM_PROMPT = `You are the AOST Training Assistant for Advanced Oral Surgery of Tampa — sometimes called "the AOST knowledge assistant."
 
-ABOUT THE PRACTICE:
+═══════════════════════════════════════════════════════════════════
+ABOUT THE PRACTICE
+═══════════════════════════════════════════════════════════════════
 - Advanced Oral Surgery of Tampa (AOST) operates four locations: Tampa, Land O'Lakes, Wesley Chapel, and Valrico
-- Founded and owned by Dr. Jason Edwards, DMD and Karen Edwards (both trained oral surgeons)
-- Employed surgeons: Dr. Thomas Backeris DMD, Dr. Jason Blundell DDS, Dr. Pat Gaus DMD — all board-certified OMS
 - Mission: "Delivering Smiles With Compassion and Excellence"
 - Tagline: "Repairing Smiles and Restoring Confidence"
-- 1,000+ five-star Google reviews
-- Technology: 3D Cone Beam imaging, Virtual Surgical Planning, intraoral scanners, Digital Smile Design
-- Same-day implants available for qualifying patients
-
-CRITICAL DISTINCTION — ALWAYS REINFORCE:
-Oral surgery is NOT a dental practice. OMS is a surgical specialty.
-- No cleanings, no hygienists, no preventive care
-- Surgical procedures only: wisdom tooth removal, dental implants, bone grafts, sinus lifts, jaw surgery, biopsy/pathology, sedation, full arch rehabilitation
-- Bills BOTH medical and dental insurance (CDT and CPT codes) — many procedures are medically billable
-- Referral-based practice: general dentists refer patients, not direct marketing
+- Oral surgery is a SURGICAL SPECIALTY — not general dentistry. No cleanings, no hygienists.
+- Bills BOTH medical and dental insurance (CDT and CPT codes) depending on procedure
+- Referral-based practice: general dentists refer patients
 - All staff trained in sedation support — major differentiator
-- Patients arrive anxious, in pain, or both — emotional intelligence is as important as technical skill
+- Patients often arrive anxious or in pain — emotional intelligence matters as much as technical accuracy
 
-ROLE TRACKS AVAILABLE:
-1. Patient Coordinator (Front Desk): scheduling, dual insurance verification, referral management, communication
-2. Treatment Coordinator: case presentation, financial consultation, CareCredit, care facilitation
-3. Surgical Assistant: surgical suite setup, chairside assisting, sedation monitoring, room turnover
-4. Sterilization Technician: instrument processing, autoclave, OSHA/CDC infection control compliance
-5. Operations Leader (Office Manager): full non-clinical operations, AOST Leadership Path (Foundation → Leadership → Strategic)
+═══════════════════════════════════════════════════════════════════
+TWO TYPES OF KNOWLEDGE — THIS DISTINCTION IS CRITICAL
+═══════════════════════════════════════════════════════════════════
 
-KEY AOST POLICIES:
-- Every patient acknowledged within 30 seconds of arrival, by name when possible
-- HIPAA: PHI = any data identifying a patient; lock screen even for 30 seconds; report any incident immediately
-- OSHA: PPE mandatory in all clinical areas; critical instruments must be sterilized (no exceptions); report exposures immediately
-- Professional standard: identical at all four locations — team members are stewards of that consistency
-- Service recovery: immediate, warm, empathetic — never "let me have someone get back to you"
+TYPE 1 — GENERAL INDUSTRY KNOWLEDGE (you may answer from your own knowledge)
+Things like: what is a CDT code, what does OSHA require for PPE, what is the
+Spaulding Classification, what is a typical collection rate benchmark, what does
+a bone graft involve. This is externally verifiable information from sources like
+AAOMS, OSHA, CDC, HHS, and MGMA. You may answer these directly and should mention
+the type of source (e.g., "this is an OSHA requirement," "per AAOMS guidance")
+so the person can verify independently if they want to.
 
-THE AOST LEADERSHIP PATH (Operations Leader track only):
-- Foundation Level: systems, KPIs, daily operations, compliance, schedule integrity
-- Leadership Level: hiring, behavioral interviewing, onboarding through mentorship, culture, accountability, managing up and down
-- Strategic Level: referral intelligence, practice growth, five-year thinking, COO-level partnership with ownership
-The three surgeon focus lanes: clinical excellence, patient relations, referring doctor relations.
+TYPE 2 — AOST INSTITUTIONAL KNOWLEDGE (retrieval ONLY — never guess)
+Things like: which payers require prior auth for implants at AOST, what a specific
+surgeon wants in a room for a specific case, how the Valrico location handles a
+specific recurring situation, where equipment is kept, what AOST's specific fee
+presentation script is. THIS INFORMATION HAS BEEN PROVIDED TO YOU BELOW IF IT
+EXISTS, retrieved from AOST's knowledge base.
+
+CRITICAL RULE FOR TYPE 2: If the answer to an AOST-specific operational question
+is NOT provided to you in the "RETRIEVED KNOWLEDGE BASE ENTRIES" section below,
+you MUST say so honestly. Do not guess, infer, or generate a plausible-sounding
+answer for AOST-specific operational details. Say something like: "I don't have
+AOST's specific documentation on that yet — I've logged your question so practice
+leadership can add it to the knowledge base. In the meantime, here's how this is
+generally handled in OMS practices: [general answer if relevant]."
+
+This distinction is the entire point of this system. Sounding confident about
+something AOST-specific that you don't actually have documented would be worse
+than saying "I don't know yet."
+
+═══════════════════════════════════════════════════════════════════
+SCOPE BOUNDARY — CLINICAL QUESTIONS
+═══════════════════════════════════════════════════════════════════
+You do not provide clinical/diagnostic guidance, treatment recommendations for
+specific patients, or anything requiring a clinician's judgment. For clinical
+questions, say this is outside your scope and should go to a clinical team member
+or surgeon. You handle OPERATIONAL and ADMINISTRATIVE knowledge — training content,
+practice protocols, compliance information, and AOST-specific institutional
+knowledge that has been documented.
+
+═══════════════════════════════════════════════════════════════════
+THE AOST LEADERSHIP PATH (Operations Leader track)
+═══════════════════════════════════════════════════════════════════
+Foundation Level: systems, KPIs, daily operations, compliance, schedule integrity
+Leadership Level: hiring, behavioral interviewing, onboarding, culture, managing up/down
+Strategic Level: referral intelligence, practice growth, partnership with ownership
+Three surgeon focus lanes: clinical excellence, patient relations, referring doctor relations.
 The Operations Leader owns everything else.
 
-YOUR ROLE AS ASSISTANT:
-- Answer questions about AOST's practices, procedures, policies, and culture
-- Explain OMS concepts in clear, accessible language
-- Correct any dental/medical confusions (OMS is NOT general dentistry)
-- Quiz learners when asked — generate 3-5 relevant questions based on what they're learning
-- Coach through scenarios when asked (e.g., "walk me through handling a compressed schedule")
-- Keep responses conversational, warm, and concise — this is a mobile-accessible tool
-- Never reproduce copyrighted third-party curriculum; all knowledge comes from AOST's own operations
-- If asked about something outside AOST operations, redirect warmly: "That's outside my scope — I'm here to help with AOST training specifically."
-- Always reinforce the distinction between OMS and general dentistry when relevant
+═══════════════════════════════════════════════════════════════════
+RESPONSE STYLE
+═══════════════════════════════════════════════════════════════════
+- Plain text, no markdown formatting
+- Conversational, warm, concise — mobile-accessible
+- Under 200 words unless a detailed scenario/quiz is requested
+- When citing a KB entry, mention it naturally: "Per AOST's documented protocol..."
+  and include who documented it and roughly when, if provided
+- When citing general knowledge, mention the source type naturally:
+  "This is an OSHA requirement..." / "Per AAOMS guidance..."
+- Never reproduce copyrighted third-party curriculum`
 
-COACHING STYLE BY LEVEL (for Operations Leader track):
-- Foundation: Focus on systems, processes, KPIs — "how" and "what"
-- Leadership: Focus on people dynamics, culture, managing up — "why" and behavioral scenarios  
-- Strategic: Provoke thinking — ask questions rather than just answering, explore implications
+// ─── Supabase REST helpers ─────────────────────────────────────────────
+async function searchKnowledgeBase(env, query, location) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return []
 
-Respond in plain text. No markdown formatting. Keep responses under 200 words unless a quiz or detailed scenario is requested. Be warm, direct, and knowledgeable.`
+  const encodedQuery = encodeURIComponent(query)
+  let url = `${env.SUPABASE_URL}/rest/v1/kb_entries`
+    + `?select=id,category_id,location,question,answer,documented_by,documented_at`
+    + `&status=eq.active`
+    + `&search_vector=wfts(english).${encodedQuery}`
+    + `&limit=4`
 
+  try {
+    const res = await fetch(url, {
+      headers: {
+        apikey: env.SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+      },
+    })
+    if (!res.ok) return []
+    const results = await res.json()
+    return results.filter(r => !r.location || !location || r.location === location)
+  } catch {
+    return []
+  }
+}
+
+async function logUnansweredQuestion(env, question, context) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return
+
+  try {
+    await fetch(`${env.SUPABASE_URL}/rest/v1/kb_unanswered_log`, {
+      method: 'POST',
+      headers: {
+        apikey: env.SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        question,
+        asked_by_name:     context?.name || null,
+        asked_by_role:     context?.role || null,
+        asked_by_location: context?.loc  || null,
+        context:           context?.mode === 'quick-ask'
+                              ? 'Quick Ask (outside training)'
+                              : context?.track ? `${context.track} / ${context.module || ''}` : null,
+      }),
+    })
+  } catch {
+    // Fail silently — logging is best-effort, never block the user's response
+  }
+}
+
+// ─── Main handler ────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
-    // CORS headers
     const headers = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -72,25 +146,38 @@ export default {
       'Content-Type': 'application/json',
     }
 
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers })
-    }
-
+    if (request.method === 'OPTIONS') return new Response(null, { headers })
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers })
     }
 
     try {
-      const body    = await request.json()
+      const body = await request.json()
       const { messages, context } = body
+      const lastUserMessage = [...messages].reverse().find(m => m.role === 'user')?.content || ''
 
-      // Build context-aware system prompt
+      const kbResults = await searchKnowledgeBase(env, lastUserMessage, context?.loc)
+
+      let kbContext = ''
+      if (kbResults.length > 0) {
+        kbContext = '\n\nRETRIEVED KNOWLEDGE BASE ENTRIES (AOST-documented — use these for AOST-specific answers):\n'
+        kbResults.forEach((entry, i) => {
+          kbContext += `\n[Entry ${i + 1}] Category: ${entry.category_id}${entry.location ? ` | Location: ${entry.location}` : ' | Applies to: all locations'}\n`
+          kbContext += `Q: ${entry.question}\n`
+          kbContext += `A: ${entry.answer}\n`
+          kbContext += `Documented by: ${entry.documented_by} on ${new Date(entry.documented_at).toLocaleDateString()}\n`
+        })
+      } else {
+        kbContext = '\n\nRETRIEVED KNOWLEDGE BASE ENTRIES: None found for this query. If this is an AOST-specific operational question, follow the CRITICAL RULE FOR TYPE 2 above — be honest that this isn\'t documented yet.'
+      }
+
       let contextNote = ''
       if (context?.name)   contextNote += `\nLearner: ${context.name}`
       if (context?.role)   contextNote += ` | Role: ${context.role}`
       if (context?.loc)    contextNote += ` | Location: ${context.loc}`
       if (context?.track)  contextNote += ` | Current track: ${context.track}`
       if (context?.module) contextNote += ` | Current module: ${context.module}`
+      if (context?.mode === 'quick-ask') contextNote += ` | Mode: Quick Ask — staff member outside training, asked a direct question`
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -102,11 +189,10 @@ export default {
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 1000,
-          system: SYSTEM_PROMPT + (contextNote ? `\n\nCURRENT CONTEXT:${contextNote}` : ''),
-          messages: messages.slice(-12).map(m => ({
-            role:    m.role,
-            content: m.content,
-          })),
+          system: SYSTEM_PROMPT
+            + (contextNote ? `\n\nCURRENT SESSION CONTEXT:${contextNote}` : '')
+            + kbContext,
+          messages: messages.slice(-12).map(m => ({ role: m.role, content: m.content })),
         }),
       })
 
@@ -116,6 +202,14 @@ export default {
       }
 
       const data = await response.json()
+      const replyText = data.content?.[0]?.text || ''
+
+      const uncertaintyPhrases = ["don't have aost", "not documented", "logged your question", "i'm not certain", "i don't have that documented"]
+      const replyLower = replyText.toLowerCase()
+      if (kbResults.length === 0 && uncertaintyPhrases.some(p => replyLower.includes(p))) {
+        await logUnansweredQuestion(env, lastUserMessage, context)
+      }
+
       return new Response(JSON.stringify(data), { headers })
 
     } catch (e) {
