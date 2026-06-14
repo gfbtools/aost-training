@@ -52,32 +52,13 @@ export default function AdminDashboard({ onClose }) {
   const [pass,       setPass]    = useState('')
   const [authed,     setAuthed]  = useState(false)
   const [passErr,    setPassErr] = useState(false)
-  const [imported,   setImport]  = useState([])
 
   const handleAuth = () => {
     if (pass === ADMIN_PASS) { setAuthed(true); setPassErr(false) }
     else setPassErr(true)
   }
 
-  const entries = useMemo(() => {
-    const local = readAllProfiles()
-    return [...local, ...imported]
-  }, [imported])
-
-  const handleImport = (e) => {
-    try {
-      const text = e.target.value
-      if (!text.trim()) return
-      const data = JSON.parse(text)
-      if (data.profile) {
-        setImport(prev => {
-          const exists = prev.find(p => p.profile.name === data.profile.name)
-          if (exists) return prev.map(p => p.profile.name === data.profile.name ? data : p)
-          return [...prev, data]
-        })
-      }
-    } catch {}
-  }
+  const entries = useMemo(() => readAllProfiles(), [])
 
   if (!authed) {
     return (
@@ -127,7 +108,7 @@ export default function AdminDashboard({ onClose }) {
         }}>
           <span style={{ color: 'var(--lgold)', fontWeight: 700 }}>Note: </span>
           Currently showing progress from this device. For full team tracking across all devices,
-          connect to Supabase — see the deployment README. Team members can also export their progress code below.
+          connect to Supabase — see the deployment README.
         </div>
 
         {/* Team table */}
@@ -192,23 +173,8 @@ export default function AdminDashboard({ onClose }) {
             borderRadius: 10, border: '1px dashed var(--border)', marginBottom: 28,
           }}>
             No team members tracked on this device yet.
-            <br />Use the import field below to add progress codes from other devices.
           </div>
         )}
-
-        {/* Import codes from other devices */}
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24 }}>
-          <div className="label-sm" style={{ marginBottom: 10 }}>Import Progress Code</div>
-          <p className="body-sm" style={{ marginBottom: 12 }}>
-            Team members can share their progress by pasting their progress code here.
-          </p>
-          <textarea
-            className="input"
-            placeholder='Paste a progress code here ({"profile":{...},"progress":{...},...})'
-            onChange={handleImport}
-            style={{ height: 80, fontSize: 12, fontFamily: 'monospace' }}
-          />
-        </div>
       </div>
     </div>
   )

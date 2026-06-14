@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 const BASE = import.meta.env.BASE_URL
 
-export default function Header({ onHome, profile, currentView, onEditProfile, onOpenAdmin, onOpenKB, onShareProgress }) {
+export default function Header({ onHome, profile, currentView, onEditProfile, onOpenAdmin, onOpenKB }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -84,7 +84,7 @@ export default function Header({ onHome, profile, currentView, onEditProfile, on
           )}
 
           {/* Settings / Admin menu */}
-          {(onOpenAdmin || onOpenKB || onShareProgress) && (
+          {(onOpenAdmin || onOpenKB) && (
             <div ref={menuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setMenuOpen(o => !o)}
@@ -106,7 +106,6 @@ export default function Header({ onHome, profile, currentView, onEditProfile, on
                   borderRadius: 10, padding: 6, boxShadow: 'var(--shadow)',
                   zIndex: 200,
                 }}>
-                  {onShareProgress && menuItem('📋 Share My Progress', onShareProgress)}
                   {onOpenKB        && menuItem('🧠 Knowledge Base', onOpenKB)}
                   {onOpenAdmin     && menuItem('🔐 Admin Dashboard', onOpenAdmin)}
                 </div>

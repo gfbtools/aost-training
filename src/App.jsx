@@ -41,16 +41,6 @@ export default function App() {
         onEditProfile={() => setEdit(true)}
         onOpenAdmin={() => setAdmin(true)}
         onOpenKB={() => setKB(true)}
-        onShareProgress={() => {
-          const exportData = {
-            profile,
-            progress: JSON.parse(localStorage.getItem('aost-progress-v2') || '{}'),
-            quizzes:  JSON.parse(localStorage.getItem('aost-quizzes-v2')  || '{}'),
-          }
-          navigator.clipboard.writeText(JSON.stringify(exportData))
-            .then(() => alert('Progress code copied! Share with your admin.'))
-            .catch(() => prompt('Copy this progress code:', JSON.stringify(exportData)))
-        }}
       />
 
       <main style={{ flex: 1 }}>
