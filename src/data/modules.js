@@ -479,7 +479,7 @@ universal: {
     },
 
     {
-      id: 'sa3', title: 'Room Turnover', scope: 'aost',
+      id: 'sa3', title: 'Room Turnover', scope: 'foundations',
       duration: '20 min', hasQuiz: true,
       lessons: [
         {
@@ -589,7 +589,7 @@ sterilization: {
             H('Not an Office Manager. An Operations Leader.'),
             B('The title "office manager" describes a clerical function — managing paperwork, answering phones, booking appointments. That is not what this role is at AOST. The Operations Leader at each location is the chief non-clinical authority at that site. You own everything that is not clinical. Systems. Team. Patient experience. Compliance. Schedule performance. Operational consistency with the other three locations.'),
             B('The surgeons\' three lanes are: clinical excellence, patient relationships, and referring doctor relationships. Everything that pulls them out of those three lanes is an operational failure. Your job is to prevent those failures — not reactively, by fixing problems as they arise, but proactively, by building the systems that prevent problems from occurring in the first place.'),
-            B('The surgeons\' three lanes are: clinical excellence, patient relationships, and referring doctor relationships. Everything that pulls them out of those three lanes is an operational failure. Your job is to prevent those failures — not reactively, but proactively, by building the systems that make the practice reliable without requiring constant intervention.'),
+            B('This role does not arrive fully formed on day one. It is built in stages, each one a prerequisite for the next. AOST structures that development as the AOST Leadership Path — three levels that take you from running daily operations correctly, to building a team that performs without your constant presence, to becoming a genuine strategic partner in how the practice grows.'),
             LV(
               { title: 'Foundation', subtitle: 'Running the Operation', color: '#4A1A6A', desc: 'Systems, daily operations, KPIs, compliance, schedule integrity. The practice runs correctly every day.' },
               { title: 'Leadership', subtitle: 'Building the Team', color: '#1B6CA8', desc: 'Hiring, onboarding, culture, accountability, and managing both up and down. The team performs without your constant presence.' },
@@ -602,7 +602,7 @@ sterilization: {
     },
 
     {
-      id: 'om2', scope: 'aost', title: 'Foundation: KPIs and Practice Performance',
+      id: 'om2', scope: 'foundations', title: 'Foundation: KPIs and Practice Performance',
       duration: '30 min', hasQuiz: true,
       levelLabel: 'Foundation',
       lessons: [
@@ -649,7 +649,7 @@ sterilization: {
 
     // ── LEADERSHIP LEVEL ──────────────────────────────────────────
     {
-      id: 'om4', scope: 'aost', title: 'Leadership: Building and Keeping the Team',
+      id: 'om4', scope: 'foundations', title: 'Leadership: Building and Keeping the Team',
       duration: '30 min', hasQuiz: true,
       levelLabel: 'Leadership',
       lessons: [
