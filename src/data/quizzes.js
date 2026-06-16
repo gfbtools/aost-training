@@ -791,20 +791,65 @@ export const QUIZZES = {
   },
 
   om5: {
-    title: 'AOST Leadership Path — Strategic Level',
+    title: 'Culture, Accountability & Managing Up',
     passPct: 80,
     questions: [
       {
-        q: 'Strategic thinking at the Operations Leader level means:',
+        q: 'Managing "up" as an Operations Leader means:',
         options: [
-          'Focusing exclusively on this week\'s schedule and staffing',
-          'Understanding how today\'s operational decisions affect the practice\'s growth trajectory',
-          'Creating long business plans for the surgeons to review',
-          'Analyzing competitors and adjusting pricing',
+          'Supervising higher-level staff at other locations',
+          'Reporting production numbers to corporate headquarters',
+          'Navigating the relationship with ownership, communicating operational reality, and earning trust at the leadership level',
+          'Advocating for staff compensation increases',
+        ],
+        correct: 2,
+        explanation: 'Managing up means earning trust, communicating performance with clarity, and being a reliable source of truth — not a filter.',
+      },
+      {
+        q: 'Culture at AOST is primarily defined by:',
+        options: [
+          'The mission statement on the website',
+          'What a leader allows, rewards, and corrects — one response at a time',
+          'The physical environment of the practice',
+          'How new team members are introduced to the team',
         ],
         correct: 1,
-        explanation: 'Strategic thinking is seeing the connection between daily operations and long-term outcomes. Today\'s referral call quality affects next year\'s volume. Today\'s culture affects next year\'s retention. The Operations Leader sees both.',
+        explanation: 'Culture is not aspirational language. It is built or eroded by every response a leader makes to every situation.',
       },
+    ],
+  },
+  om6: {
+    title: 'Referral Intelligence',
+    passPct: 80,
+    questions: [
+      {
+        q: 'When a referring office that used to send 8 patients a month now sends 3, your first move is:',
+        options: [
+          'Assume it\'s seasonal and monitor next month',
+          'Contact the referring office, understand the change, and diagnose whether it\'s relationship or operational',
+          'Offer the office a gift to re-engage',
+          'Report the decline to the surgeons and ask them to handle it',
+        ],
+        correct: 1,
+        explanation: 'A referral volume drop is a signal. Contact the office directly, listen, and diagnose before acting.',
+      },
+      {
+        q: 'Every process that touches a referred patient is:',
+        options: [
+          'A clinical quality issue',
+          'A billing department function',
+          'A referral relationship management process owned by operations',
+          'A surgeon communication matter',
+        ],
+        correct: 2,
+        explanation: 'Scheduling responsiveness, patient experience, consultation report turnaround — these are all referral management processes.',
+      },
+    ],
+  },
+  om7: {
+    title: 'The Operations Leader as Growth Driver',
+    passPct: 80,
+    questions: [
       {
         q: 'As an AOST Operations Leader, what best defines your success at the highest level?',
         options: [
@@ -814,7 +859,18 @@ export const QUIZZES = {
           'You have successfully reduced overhead costs',
         ],
         correct: 2,
-        explanation: 'The highest expression of operational leadership is a practice that runs to standard through systems, trained people, and accountability structures — not through your constant presence. You build the machine, then you lead it.',
+        explanation: 'The highest expression of this role is a practice that runs to standard through systems and trained people — not through your constant presence.',
+      },
+      {
+        q: 'Strategic thinking at the Operations Leader level means:',
+        options: [
+          'Focusing exclusively on this week\'s schedule and staffing',
+          'Understanding how today\'s operational decisions affect the practice\'s growth trajectory',
+          'Creating long business plans for the surgeons to review',
+          'Analyzing competitors and adjusting pricing',
+        ],
+        correct: 1,
+        explanation: 'Strategic thinking connects daily operations to long-term outcomes. Today\'s culture affects next year\'s retention.',
       },
     ],
   },
